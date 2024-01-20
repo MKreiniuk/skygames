@@ -5,7 +5,8 @@ import skytecgames.com.entities.Task;
 import skytecgames.com.exceptions.NoDataInDBException;
 import skytecgames.com.model.ClanAddGoldDTO;
 import skytecgames.com.model.ClanDTO;
-import skytecgames.com.model.TastComplitedDTO;
+import skytecgames.com.model.TaskComplitedDTO;
+
 import skytecgames.com.repo.ClanRepository;
 import skytecgames.com.repo.TaskRepository;
 
@@ -30,14 +31,24 @@ public class ClanService implements IClan {
 
     @Override
     public ClanAddGoldDTO addingGold(long id, int gold) {
-        return null;
+        Clan temp = clanRepo.findById(id).orElseThrow(() -> new NoDataInDBException());
+        int goldNew = temp.getGold()+ gold;
+        temp.setGold(goldNew);
+        try {
+            clanRepo.save(temp);
+        } catch (Exception e) {
+           return new ClanAddGoldDTO(id, false);
+        }
+
+
+        return new ClanAddGoldDTO(id, true);
     }
 
     @Override
-    public TastComplitedDTO completeTask(long taskId, long id) {
+    public TaskComplitedDTO completeTask(long taskId, long id) {
         Task task = taskRepo.findById(taskId).orElseThrow(() -> new NoDataInDBException());
-        Clan clan= clanRepo.findById(id).orElseThrow(() -> new NoDataInDBException());
+        int reward = task.getReward();
 
-        return null;
+        return new TaskComplitedDTO(taskId, id,addingGold(id, reward).isAdded());
     }
 }

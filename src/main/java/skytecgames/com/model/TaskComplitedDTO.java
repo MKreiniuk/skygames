@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class TastComplitedDTO {
-    TaskDTO task;
-    ClanDTO clan;
+public class TaskComplitedDTO {
+    Long taskId;
+    Long clanId;
     boolean isCompleted;
 }
