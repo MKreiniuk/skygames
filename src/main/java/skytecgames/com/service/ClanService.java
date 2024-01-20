@@ -45,6 +45,14 @@ public class ClanService implements IClan {
     }
 
     @Override
+    public ClanAddGoldDTO addGoldByUser(long userId, long clanId, int gold) {
+        /*вы реальном проекте необходимо реализовать repo users и сделать отдельные DTO для пополнения
+        с учетом того, что это тестовое задание сделано допущение в этой части.
+         */
+        return addingGold(clanId, gold);
+    }
+
+    @Override
     public TaskComplitedDTO completeTask(long taskId, long id) {
         Task task = taskRepo.findById(taskId).orElseThrow(() -> new NoDataInDBException());
         int reward = task.getReward();

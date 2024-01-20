@@ -7,8 +7,9 @@ import skytecgames.com.model.TaskComplitedDTO;
 
 public interface IClan {
     ClanDTO getClan(long id);
-    ClanAddGoldDTO addingGold(long id, int gold);
+    ClanAddGoldDTO addingGold(long clanId, int gold);
+    ClanAddGoldDTO addGoldByUser(long userId, long clanId , int gold);
 
-    TaskComplitedDTO completeTask(long taskId, long id);
+    TaskComplitedDTO completeTask(long taskId, long clanId);
 
 }
