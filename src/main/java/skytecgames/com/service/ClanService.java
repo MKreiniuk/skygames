@@ -10,6 +10,8 @@ import skytecgames.com.model.TaskComplitedDTO;
 import skytecgames.com.repo.ClanRepository;
 import skytecgames.com.repo.TaskRepository;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class ClanService implements IClan {
 
     ClanRepository clanRepo;
@@ -23,8 +25,8 @@ public class ClanService implements IClan {
 
     @Override
     public ClanDTO getClan(long id) {
-        Clan clan= clanRepo.findById(id).orElseThrow(() -> new NoDataInDBException());
-        ClanDTO res = new ClanDTO(clan.getId(), clan.getName(), clan.getGold());
+        Clan clan = clanRepo.findById(id).orElseThrow(() -> new NoDataInDBException());
+        ClanDTO res = new ClanDTO(clan.getId(), clan.getName(), clan.getGold().get());
 
         return res;
     }
@@ -32,31 +34,40 @@ public class ClanService implements IClan {
     @Override
     public ClanAddGoldDTO addingGold(long id, int gold) {
         Clan temp = clanRepo.findById(id).orElseThrow(() -> new NoDataInDBException());
-        int goldNew = temp.getGold()+ gold;
-        temp.setGold(goldNew);
-        try {
-            clanRepo.save(temp);
-        } catch (Exception e) {
-           return new ClanAddGoldDTO(id, false);
+        AtomicInteger currentGold = temp.getGold();
+
+
+        while (true) {
+            int current = currentGold.get();
+            int updated = current + gold;
+
+            if (currentGold.compareAndSet(current, updated)) {
+                try {
+                    clanRepo.save(temp);
+                } catch (Exception e) {
+                    return new ClanAddGoldDTO(id, false);
+                }
+
+                return new ClanAddGoldDTO(id, true);
+            }
         }
 
 
-        return new ClanAddGoldDTO(id, true);
     }
 
     @Override
     public ClanAddGoldDTO addGoldByUser(long userId, long clanId, int gold) {
         /*вы реальном проекте необходимо реализовать repo users и сделать отдельные DTO для пополнения
-        с учетом того, что это тестовое задание сделано допущение в этой части.
-         */
+       с учетом того, что это тестовое задание сделано допущение в этой части.
+        */
         return addingGold(clanId, gold);
     }
 
     @Override
-    public TaskComplitedDTO completeTask(long taskId, long id) {
+    public TaskComplitedDTO completeTask(long taskId, long clanId) {
         Task task = taskRepo.findById(taskId).orElseThrow(() -> new NoDataInDBException());
-        int reward = task.getReward();
+            int reward = task.getReward();
 
-        return new TaskComplitedDTO(taskId, id,addingGold(id, reward).isAdded());
+            return new TaskComplitedDTO(taskId, clanId, addingGold(clanId, reward).isAdded());
     }
 }

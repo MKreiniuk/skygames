@@ -1,10 +1,9 @@
 package skytecgames.com.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,12 +11,12 @@ import lombok.*;
 @Entity
 @Getter
 public class Clan {
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "clan_id", length = 10, unique = true, nullable = false)
     private long id;
     private String name;
     @Setter
-    private int gold;
+    private AtomicInteger gold;
 
 }
